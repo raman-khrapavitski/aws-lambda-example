@@ -1,0 +1,17 @@
+# IntelliJ project files
+*.iml
+*.iws
+*.ipr
+.idea
+out
+
+# Eclipse project files
+.classpath
+.project
+.settings
+
+# Common files
+build
+.gradle
+bin
+*.log

@@ -1,0 +1,99 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'net.ltgt.apt'
+apply plugin: 'checkstyle'
+apply plugin: 'jacoco'
+apply plugin: 'pmd'
+apply plugin: 'findbugs'
+
+sourceCompatibility = 1.8
+targetCompatibility = 1.8
+
+version = "${projectVersion}"
+group = "${projectGroup}"
+
+buildscript {
+    repositories {
+        maven {
+            url 'https://plugins.gradle.org/m2/'
+        }
+        mavenLocal()
+    }
+    dependencies {
+        classpath("net.ltgt.gradle:gradle-apt-plugin:${gradleAptPluginVersion}")
+    }
+}
+
+repositories {
+    mavenCentral()
+    mavenLocal()
+}
+
+dependencies {
+    compile group: 'com.amazonaws', name: 'aws-lambda-java-core', version: "${awsCoreVersion}"
+    compile group: 'com.amazonaws', name: 'aws-lambda-java-log4j2', version: "${awsLoggerVersion}"
+    compile group: 'com.amazonaws', name: 'aws-java-sdk-dynamodb', version: "${awsDinamoDBVersion}"
+    compile group: 'com.amazonaws', name: 'aws-lambda-java-events', version: "${awsLambdaEventsVersion}"
+
+    compile group: 'com.google.guava', name: 'guava', version: "${guavaVersion}"
+
+    compile group: 'org.apache.logging.log4j', name: 'log4j-core', version: "${log4CoreVersion}"
+    compile group: 'org.apache.logging.log4j', name: 'log4j-api', version: "${log4CoreVersion}"
+
+    compileOnly group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+    apt group: 'org.projectlombok', name: 'lombok', version: "${lombokVersion}"
+}
+
+task buildZip(type: Zip) {
+    from compileJava
+    from processResources
+    into('lib') {
+        from configurations.runtime
+    }
+}
+
+checkstyle {
+    ignoreFailures = true
+    sourceSets = [sourceSets.main]
+    config = project.resources.text.fromFile("${project.projectDir}/code-quality/checkstyle/checkstyle_rules.xml")
+    configProperties.suppressionsFile = "${project.projectDir}/code-quality/checkstyle/checkstyle-suppressions.xml"
+}
+
+pmd {
+    ignoreFailures = true
+    sourceSets = [sourceSets.main]
+    toolVersion = "${pmdVersion}"
+    ruleSetFiles = files("/code-quality/pmd/pmd-rules.xml")
+    ruleSets = []
+}
+
+findbugs {
+    ignoreFailures = true
+    sourceSets = [sourceSets.main]
+    excludeFilter = file("/code-quality/findbugs/findbugs-exclude.xml")
+    toolVersion = "${findBugsVersion}"
+}
+
+tasks.withType(Checkstyle) {
+    reports {
+        html.stylesheet(project.resources.text.fromFile(
+                "${project.projectDir}/code-quality/checkstyle/checkstyle-noframes-severity-sorted.xsl"))
+    }
+}
+
+tasks.withType(Pmd) {
+    reports {
+        html.enabled(false)
+        xml.enabled(true)
+    }
+}
+
+tasks.withType(FindBugs) {
+    reports {
+        xml.enabled(true)
+        xml.withMessages(true)
+        html.enabled(false)
+    }
+}
+
+build.dependsOn buildZip
