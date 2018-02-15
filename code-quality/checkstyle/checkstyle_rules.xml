@@ -297,9 +297,7 @@
         <!-- <property name="applyToPackage" value="true"/> -->
         <!-- <property name="applyToPrivate" value="true"/> -->
         <!-- Static variable should start from a small 's' letter -->
-        <module name="StaticVariableName">
-            <property name="format" value="^s[A-Z]+[a-zA-Z0-9]*$"/>
-        </module>
+        <module name="StaticVariableName"/>
 
         <!-- Validates length of identifiers for static, non-final fields -->
         <!-- See http://checkstyle.sourceforge.net/config_naming.html#StaticVariableName -->
@@ -492,19 +490,6 @@
         <!-- Checks for redundant import statements -->
         <!-- See http://checkstyle.sourceforge.net/config_imports.html#RedundantImport -->
         <module name="RedundantImport"/>
-
-        <!-- Checks for unused import statements -->
-        <!-- See http://checkstyle.sourceforge.net/config_imports.html#UnusedImports -->
-        <!-- <property name="processJavadoc" value="true"/> -->
-        <module name="UnusedImports"/>
-
-        <module name="CustomImportOrder">
-            <property name="customImportOrderRules"
-                      value="STATIC###STANDARD_JAVA_PACKAGE###SPECIAL_IMPORTS"/>
-            <property name="specialImportsRegExp" value="com.xplorie"/>
-            <property name="sortImportsInGroupAlphabetically" value="true"/>
-            <property name="separateLineBetweenGroups" value="true"/>
-        </module>
 
         <!-- *************************************************** -->
         <!-- Checks for Size Violations.                         -->
